@@ -1,0 +1,19 @@
+{
+  "name": "sala-front",
+  "version": "1.0.0",
+  "description": "Este é o front-end do **SalaSphere**, uma aplicação web elegante e reativa no modelo **Single Page Application (SPA)**, projetada com HTML, CSS e JavaScript puro (Vanilla JS) para a gestão completa de coworkings, salas e agendamentos.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint js/auth.js dashboard/dashboard.js salas/salas.js",
+    "format": "prettier --write \"**/*.{html,css,js}\"",
+    "format:check": "prettier --check \"**/*.{html,css,js}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "eslint": "^10.4.1",
+    "prettier": "^3.8.3"
+  }
+}

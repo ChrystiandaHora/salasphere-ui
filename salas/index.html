@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SalaSphere — Agenda da Sala</title>
+        <meta
+            name="description"
+            content="Visualize e gerencie a agenda completa de uma sala de coworking com linha do tempo interativa."
+        />
+        <!-- Bootstrap 5 CSS -->
+        <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- Bootstrap Icons -->
+        <link href="../assets/css/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Local Fonts -->
+        <link href="../assets/css/fonts.css" rel="stylesheet" />
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Skip link -->
+        <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
+        <!-- Alert container -->
+        <div id="alert-container" role="status" aria-live="polite"></div>
+
+        <!-- ── Navbar ─────────────────────────────────────────────────────────── -->
+        <nav class="top-navbar" aria-label="Navegação principal">
+            <div class="navbar-inner">
+                <div style="display: flex; align-items: center; gap: 12px">
+                    <a
+                        href="../dashboard/index.html"
+                        class="btn-ghost"
+                        style="height: 36px; padding: 8px 14px"
+                        aria-label="Voltar ao Dashboard"
+                    >
+                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
+                        <span class="d-none d-sm-inline">Dashboard</span>
+                    </a>
+                    <a class="navbar-brand" href="../dashboard/index.html" aria-label="SalaSphere — ir para início">
+                        <div class="logo-box" aria-hidden="true">
+                            <i class="bi bi-layers-half logo-icon"></i>
+                        </div>
+                        <div class="d-none d-md-block">
+                            <span class="brand-title">SalaSphere</span>
+                            <span class="brand-subtitle">Agenda</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="navbar-actions">
+                    <div class="user-chip" id="user-chip" aria-label="Usuário logado">
+                        <div class="user-avatar" id="user-avatar" aria-hidden="true"></div>
+                        <span id="user-name">—</span>
+                    </div>
+                    <button
+                        class="btn-ghost"
+                        id="btn-logout"
+                        style="padding: 8px 12px; height: 36px"
+                        aria-label="Sair da plataforma"
+                    >
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ── Main Content ───────────────────────────────────────────────────── -->
+        <main class="page-wrapper" id="main-content">
+            <!-- Sala Header Card -->
+            <div class="glass-card sala-header-card mb-4" id="sala-header-card" aria-live="polite">
+                <!-- Will be populated by JS -->
+                <div style="display: flex; align-items: center; gap: 14px; width: 100%">
+                    <div
+                        style="
+                            width: 80px;
+                            height: 80px;
+                            border-radius: 14px;
+                            background: var(--color-indigo-soft);
+                            animation: badgePulse 2s infinite;
+                        "
+                        aria-hidden="true"
+                    ></div>
+                    <div style="flex: 1">
+                        <div
+                            style="
+                                height: 24px;
+                                background: rgba(255, 255, 255, 0.07);
+                                border-radius: 8px;
+                                margin-bottom: 10px;
+                                width: 60%;
+                            "
+                            aria-hidden="true"
+                        ></div>
+                        <div
+                            style="height: 16px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; width: 40%"
+                            aria-hidden="true"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agenda Section -->
+            <section aria-labelledby="agenda-heading">
+                <div class="agenda-controls">
+                    <!-- Period Navigation -->
+                    <div class="agenda-nav">
+                        <button class="btn-nav" id="btn-prev" aria-label="Período anterior">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <div class="agenda-period-label" id="period-label" aria-live="polite" aria-atomic="true">—</div>
+                        <button class="btn-nav" id="btn-next" aria-label="Próximo período">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                        </button>
+                        <button
+                            class="btn-ghost"
+                            id="btn-today"
+                            style="height: 36px; padding: 8px 14px; font-size: 0.82rem"
+                            aria-label="Ir para hoje"
+                        >
+                            Hoje
+                        </button>
+                    </div>
+
+                    <!-- View Switcher -->
+                    <div role="group" aria-label="Selecionar visualização da agenda">
+                        <div class="view-switcher">
+                            <button class="view-btn active" data-view="dia" id="view-dia" aria-pressed="true">
+                                <i class="bi bi-calendar-day me-1" aria-hidden="true"></i> Dia
+                            </button>
+                            <button class="view-btn" data-view="semana" id="view-semana" aria-pressed="false">
+                                <i class="bi bi-calendar-week me-1" aria-hidden="true"></i> Semana
+                            </button>
+                            <button class="view-btn" data-view="mes" id="view-mes" aria-pressed="false">
+                                <i class="bi bi-calendar3 me-1" aria-hidden="true"></i> Mês
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick reserve button -->
+                    <button
+                        class="btn-premium"
+                        id="btn-nova-reserva"
+                        style="height: 40px; padding: 8px 18px; font-size: 0.85rem"
+                        aria-label="Criar nova reserva para esta sala"
+                    >
+                        <i class="bi bi-calendar-plus me-2" aria-hidden="true"></i> Nova Reserva
+                    </button>
+                </div>
+
+                <!-- Agenda View Container -->
+                <div id="agenda-container" aria-label="Agenda da sala" role="region">
+                    <!-- Populated by salas.js based on selected view -->
+                </div>
+
+                <!-- Legend -->
+                <div class="agenda-legend" aria-label="Legenda de cores da agenda">
+                    <strong style="color: var(--text-secondary); font-size: 0.8rem">Legenda:</strong>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: rgba(148, 163, 184, 0.5)" aria-hidden="true"></div>
+                        <span>Passada</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: rgba(245, 158, 11, 0.5)" aria-hidden="true"></div>
+                        <span>Em andamento</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: rgba(99, 102, 241, 0.5)" aria-hidden="true"></div>
+                        <span>Futura</span>
+                    </div>
+                    <div class="legend-item" style="margin-left: auto">
+                        <i class="bi bi-plus-circle" style="color: var(--color-emerald)" aria-hidden="true"></i>
+                        <span>Clique em slot livre para reservar</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═════════════════════════════════════════════════════════════════════════
+     MODAL — Criar Reserva
+     ═════════════════════════════════════════════════════════════════════════ -->
+        <div
+            class="modal fade"
+            id="modal-reserva"
+            tabindex="-1"
+            aria-labelledby="modal-reserva-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-reserva-title">
+                            <i
+                                class="bi bi-calendar-plus me-2"
+                                style="color: var(--color-indigo)"
+                                aria-hidden="true"
+                            ></i>
+                            Nova Reserva
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-reserva" novalidate>
+                            <div class="mb-3">
+                                <label for="reserva-inicio" class="form-label">Início *</label>
+                                <input
+                                    type="datetime-local"
+                                    class="form-control input-premium"
+                                    id="reserva-inicio"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <label for="reserva-fim" class="form-label">Fim *</label>
+                                <input
+                                    type="datetime-local"
+                                    class="form-control input-premium"
+                                    id="reserva-fim"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3 form-check d-none" id="container-reserva-manutencao">
+                                <input type="checkbox" class="form-check-input" id="reserva-manutencao" />
+                                <label
+                                    class="form-check-label text-secondary-light"
+                                    for="reserva-manutencao"
+                                    style="font-size: 0.85rem; user-select: none"
+                                    >Agendar como Manutenção</label
+                                >
+                            </div>
+                            <div
+                                id="reserva-preco-preview"
+                                class="mb-3"
+                                style="
+                                    display: none;
+                                    background: var(--color-indigo-soft);
+                                    border: 1px solid var(--color-indigo-glow);
+                                    border-radius: 10px;
+                                    padding: 12px;
+                                    font-size: 0.88rem;
+                                    color: var(--text-secondary-light);
+                                "
+                            >
+                                <i
+                                    class="bi bi-calculator me-2"
+                                    style="color: var(--color-indigo)"
+                                    aria-hidden="true"
+                                ></i>
+                                <span id="reserva-preco-text"></span>
+                            </div>
+                            <button
+                                type="submit"
+                                class="btn-premium w-100"
+                                id="btn-submit-reserva"
+                                style="justify-content: center"
+                            >
+                                <i class="bi bi-check-circle me-2" aria-hidden="true"></i> Confirmar Reserva
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═════════════════════════════════════════════════════════════════════════
+     MODAL — Detalhes / Editar Reserva
+     ═════════════════════════════════════════════════════════════════════════ -->
+        <div
+            class="modal fade"
+            id="modal-detail-reserva"
+            tabindex="-1"
+            aria-labelledby="modal-detail-reserva-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-detail-reserva-title">
+                            <i
+                                class="bi bi-calendar-event me-2"
+                                style="color: var(--color-indigo)"
+                                aria-hidden="true"
+                            ></i>
+                            Detalhes da Reserva
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="detail-reserva-info" class="mb-3"></div>
+                        <div id="edit-reserva-section">
+                            <hr style="border-color: var(--border-color)" />
+                            <h6 class="fw-semibold mb-3" style="color: var(--text-secondary-light)">Editar Horários</h6>
+                            <form id="form-edit-reserva" novalidate>
+                                <input type="hidden" id="edit-reserva-id" />
+                                <div class="mb-3">
+                                    <label for="edit-inicio" class="form-label">Novo Início</label>
+                                    <input
+                                        type="datetime-local"
+                                        class="form-control input-premium"
+                                        id="edit-inicio"
+                                        required
+                                    />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-fim" class="form-label">Novo Fim</label>
+                                    <input
+                                        type="datetime-local"
+                                        class="form-control input-premium"
+                                        id="edit-fim"
+                                        required
+                                    />
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button
+                                        type="submit"
+                                        class="btn-premium flex-1"
+                                        id="btn-edit-submit"
+                                        style="justify-content: center; flex: 1"
+                                    >
+                                        <i class="bi bi-check2 me-1" aria-hidden="true"></i> Salvar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-danger"
+                                        id="btn-cancel-reserva"
+                                        style="flex: 1; justify-content: center"
+                                    >
+                                        <i class="bi bi-trash me-1" aria-hidden="true"></i> Cancelar Reserva
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="action-maintenance-section" class="d-none">
+                            <hr style="border-color: var(--border-color)" />
+                            <button
+                                type="button"
+                                class="btn-danger w-100"
+                                id="btn-remover-manutencao"
+                                style="
+                                    justify-content: center;
+                                    height: 44px;
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                "
+                            >
+                                <i class="bi bi-trash" aria-hidden="true"></i> Excluir Manutenção
+                            </button>
+                        </div>
+                        <div
+                            id="reserva-past-notice"
+                            class="d-none"
+                            style="
+                                color: var(--text-secondary);
+                                font-size: 0.88rem;
+                                background: var(--bg-dark-soft);
+                                border-radius: 10px;
+                                padding: 10px 14px;
+                                margin-top: 10px;
+                            "
+                        >
+                            <i class="bi bi-clock-history me-1" aria-hidden="true"></i>
+                            Esta reserva já foi finalizada e não pode ser editada.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Bootstrap JS ─────────────────────────────────────────────────────── -->
+        <script src="../assets/js/bootstrap.bundle.min.js"></script>
+        <!-- Auth Helpers -->
+        <script src="../js/auth.js"></script>
+        <!-- Agenda Logic -->
+        <script src="salas.js"></script>
+    </body>
+</html>

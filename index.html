@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SalaSphere — Carregando...</title>
+    </head>
+    <body>
+        <script>
+            // Roteador estático raiz compatível com o protocolo file://
+            (function () {
+                try {
+                    const session = localStorage.getItem("salasphere_session");
+                    if (session) {
+                        window.location.replace("dashboard/index.html");
+                    } else {
+                        window.location.replace("home/index.html");
+                    }
+                } catch (e) {
+                    // Fallback caso o localStorage esteja bloqueado/desabilitado
+                    window.location.replace("home/index.html");
+                }
+            })();
+        </script>
+    </body>
+</html>

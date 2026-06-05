@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SalaSphere — Acesso à Plataforma</title>
+        <meta
+            name="description"
+            content="Faça login ou cadastre-se na SalaSphere, a plataforma premium de gerenciamento de espaços de coworking."
+        />
+        <!-- Bootstrap 5 CSS -->
+        <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- Bootstrap Icons -->
+        <link href="../assets/css/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Local Fonts -->
+        <link href="../assets/css/fonts.css" rel="stylesheet" />
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <div id="alert-container" role="status" aria-live="polite"></div>
+
+        <main class="login-page" id="main-content">
+            <!-- ── Left: Brand Side ── -->
+            <section class="login-brand-side" aria-label="Apresentação da plataforma">
+                <div
+                    style="
+                        position: relative;
+                        z-index: 1;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: center;
+                    "
+                >
+                    <div class="login-brand-logo">
+                        <i class="bi bi-layers-half"></i>
+                    </div>
+                    <h1 class="login-brand-title">SalaSphere</h1>
+                    <p class="login-brand-desc">
+                        A plataforma de gerenciamento de espaços de coworking mais inteligente. Gerencie reservas,
+                        monitore ocupações e maximize a produtividade do seu espaço.
+                    </p>
+
+                    <div class="login-brand-features">
+                        <div class="login-feature-item">
+                            <div class="login-feature-icon"><i class="bi bi-calendar2-check"></i></div>
+                            <span>Agenda visual com linha do tempo interativa por sala</span>
+                        </div>
+                        <div class="login-feature-item">
+                            <div class="login-feature-icon"><i class="bi bi-shield-check"></i></div>
+                            <span>Regras inteligentes de reserva com trava temporal</span>
+                        </div>
+                        <div class="login-feature-item">
+                            <div class="login-feature-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                            <span>Dashboard em tempo real com indicadores de ocupação</span>
+                        </div>
+                        <div class="login-feature-item">
+                            <div class="login-feature-icon"><i class="bi bi-people-fill"></i></div>
+                            <span>Gestão completa de usuários e perfis de acesso</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Right: Form Side ── -->
+            <section class="login-form-side" aria-label="Formulário de acesso">
+                <div class="login-card">
+                    <h2 class="login-title">Bem-vindo 👋</h2>
+                    <p class="login-subtitle">Entre com sua conta ou crie uma nova para começar.</p>
+
+                    <!-- Tab Switcher -->
+                    <div class="tab-switcher" role="tablist" aria-label="Selecionar modo de acesso">
+                        <button
+                            class="tab-btn active"
+                            id="tab-login"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="form-login"
+                            onclick="switchTab('login')"
+                        >
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Entrar
+                        </button>
+                        <button
+                            class="tab-btn"
+                            id="tab-register"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="form-register"
+                            onclick="switchTab('register')"
+                        >
+                            <i class="bi bi-person-plus me-1"></i> Criar Conta
+                        </button>
+                    </div>
+
+                    <!-- ── Login Form ── -->
+                    <form id="form-login" role="tabpanel" aria-labelledby="tab-login" novalidate>
+                        <div class="form-group">
+                            <label for="login-email" class="form-label-custom">E-mail</label>
+                            <input
+                                type="email"
+                                id="login-email"
+                                class="input-field"
+                                placeholder="seu@email.com"
+                                autocomplete="email"
+                                inputmode="email"
+                                aria-describedby="login-email-hint"
+                                required
+                            />
+                            <span id="login-email-hint" class="visually-hidden"
+                                >Digite seu endereço de e-mail cadastrado</span
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-senha" class="form-label-custom">Senha</label>
+                            <div style="position: relative">
+                                <input
+                                    type="password"
+                                    id="login-senha"
+                                    class="input-field"
+                                    placeholder="••••••••"
+                                    autocomplete="current-password"
+                                    style="padding-right: 46px"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    id="toggle-login-senha"
+                                    class="btn-icon"
+                                    aria-label="Mostrar ou esconder senha"
+                                    style="
+                                        position: absolute;
+                                        right: 10px;
+                                        top: 50%;
+                                        transform: translateY(-50%);
+                                        padding: 4px 8px;
+                                        border: none;
+                                    "
+                                >
+                                    <i class="bi bi-eye" id="login-eye-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn-premium w-100 mt-2"
+                            id="btn-login"
+                            style="justify-content: center"
+                        >
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Entrar na Plataforma
+                        </button>
+
+                        <div class="demo-credentials mt-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>Demo admin:</strong> admin@salasphere.com / admin123<br />
+                            <strong>Demo usuário:</strong> roberto@spacecorporate.com / senha123
+                        </div>
+                    </form>
+
+                    <!-- ── Register Form ── -->
+                    <form id="form-register" role="tabpanel" aria-labelledby="tab-register" class="d-none" novalidate>
+                        <div class="form-group">
+                            <label for="reg-nome" class="form-label-custom">Nome Completo</label>
+                            <input
+                                type="text"
+                                id="reg-nome"
+                                class="input-field"
+                                placeholder="Seu nome completo"
+                                autocomplete="name"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-email" class="form-label-custom">E-mail</label>
+                            <input
+                                type="email"
+                                id="reg-email"
+                                class="input-field"
+                                placeholder="seu@email.com"
+                                autocomplete="email"
+                                inputmode="email"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-senha" class="form-label-custom">Senha</label>
+                            <div style="position: relative">
+                                <input
+                                    type="password"
+                                    id="reg-senha"
+                                    class="input-field"
+                                    placeholder="Mínimo 6 caracteres"
+                                    autocomplete="new-password"
+                                    style="padding-right: 46px"
+                                    minlength="6"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    id="toggle-reg-senha"
+                                    class="btn-icon"
+                                    aria-label="Mostrar ou esconder senha"
+                                    style="
+                                        position: absolute;
+                                        right: 10px;
+                                        top: 50%;
+                                        transform: translateY(-50%);
+                                        padding: 4px 8px;
+                                        border: none;
+                                    "
+                                >
+                                    <i class="bi bi-eye" id="reg-eye-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-confirmar" class="form-label-custom">Confirmar Senha</label>
+                            <input
+                                type="password"
+                                id="reg-confirmar"
+                                class="input-field"
+                                placeholder="Repita a senha"
+                                autocomplete="new-password"
+                                minlength="6"
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn-premium w-100 mt-2"
+                            id="btn-register"
+                            style="justify-content: center"
+                        >
+                            <i class="bi bi-person-check me-2"></i> Criar Minha Conta
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bootstrap JS -->
+        <script src="../assets/js/bootstrap.bundle.min.js"></script>
+        <!-- Auth Helpers -->
+        <script src="../js/auth.js"></script>
+        <script>
+            // ─── Redirect if already logged in ─────────────────────────────────────────
+            (function () {
+                if (getSession()) {
+                    window.location.replace("../dashboard/index.html");
+                }
+            })();
+
+            // ─── Tab switcher ───────────────────────────────────────────────────────────
+            function switchTab(tab) {
+                const tabs = { login: "form-login", register: "form-register" };
+                document.getElementById("form-login").classList.toggle("d-none", tab !== "login");
+                document.getElementById("form-register").classList.toggle("d-none", tab !== "register");
+                document.getElementById("tab-login").classList.toggle("active", tab === "login");
+                document.getElementById("tab-register").classList.toggle("active", tab === "register");
+                document.getElementById("tab-login").setAttribute("aria-selected", tab === "login" ? "true" : "false");
+                document
+                    .getElementById("tab-register")
+                    .setAttribute("aria-selected", tab === "register" ? "true" : "false");
+            }
+
+            // ─── Password toggle ────────────────────────────────────────────────────────
+            function setupPasswordToggle(btnId, inputId, iconId) {
+                document.getElementById(btnId).addEventListener("click", () => {
+                    const input = document.getElementById(inputId);
+                    const icon = document.getElementById(iconId);
+                    const show = input.type === "password";
+                    input.type = show ? "text" : "password";
+                    icon.className = show ? "bi bi-eye-slash" : "bi bi-eye";
+                });
+            }
+            setupPasswordToggle("toggle-login-senha", "login-senha", "login-eye-icon");
+            setupPasswordToggle("toggle-reg-senha", "reg-senha", "reg-eye-icon");
+
+            // ─── Login Form ─────────────────────────────────────────────────────────────
+            document.getElementById("form-login").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const email = document.getElementById("login-email").value.trim();
+                const senha = document.getElementById("login-senha").value;
+                const btn = document.getElementById("btn-login");
+                const orig = btn.innerHTML;
+
+                btn.disabled = true;
+                btn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Verificando...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/usuarios/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, senha }),
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) throw new Error(data.error || "Falha no login.");
+
+                    saveSession(data);
+                    showAlert(`Bem-vindo, ${data.nome}! Redirecionando...`, "success");
+                    setTimeout(() => window.location.replace("../dashboard/index.html"), 1000);
+                } catch (err) {
+                    showAlert(err.message, "danger");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = orig;
+                }
+            });
+
+            // ─── Register Form ──────────────────────────────────────────────────────────
+            document.getElementById("form-register").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const nome = document.getElementById("reg-nome").value.trim();
+                const email = document.getElementById("reg-email").value.trim();
+                const senha = document.getElementById("reg-senha").value;
+                const confirmar = document.getElementById("reg-confirmar").value;
+                const btn = document.getElementById("btn-register");
+                const orig = btn.innerHTML;
+
+                if (senha !== confirmar) {
+                    showAlert("As senhas não coincidem.", "danger");
+                    return;
+                }
+                if (senha.length < 6) {
+                    showAlert("A senha deve ter pelo menos 6 caracteres.", "danger");
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Criando conta...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/usuarios/registrar`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ nome, email, senha }),
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) throw new Error(data.error || "Falha no cadastro.");
+
+                    saveSession(data);
+                    showAlert(`Conta criada com sucesso! Bem-vindo, ${data.nome}!`, "success");
+                    setTimeout(() => window.location.replace("../dashboard/index.html"), 1100);
+                } catch (err) {
+                    showAlert(err.message, "danger");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = orig;
+                }
+            });
+
+            // Apply font scale on load
+            if (typeof applyFontScale === "function") {
+                applyFontScale();
+            }
+        </script>
+    </body>
+</html>

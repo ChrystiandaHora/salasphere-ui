@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SalaSphere — Dashboard</title>
+        <meta
+            name="description"
+            content="Dashboard de gerenciamento de espaços de coworking — SalaSphere. Monitore ocupações, gerencie salas e reserve espaços em tempo real."
+        />
+        <!-- Bootstrap 5 CSS -->
+        <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- Bootstrap Icons -->
+        <link href="../assets/css/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Local Fonts -->
+        <link href="../assets/css/fonts.css" rel="stylesheet" />
+        <!-- Shared CSS -->
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Skip link -->
+        <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
+        <!-- Alert container -->
+        <div id="alert-container" role="status" aria-live="polite"></div>
+
+        <!-- ── Navbar ─────────────────────────────────────────────────────────── -->
+        <nav class="top-navbar" aria-label="Navegação principal">
+            <div class="navbar-inner">
+                <a class="navbar-brand" href="index.html" aria-label="SalaSphere — ir para início">
+                    <div class="logo-box" aria-hidden="true">
+                        <i class="bi bi-layers-half logo-icon"></i>
+                    </div>
+                    <div>
+                        <span class="brand-title">SalaSphere</span>
+                        <span class="brand-subtitle">Coworking Platform</span>
+                    </div>
+                </a>
+
+                <div class="navbar-actions">
+                    <!-- User chip -->
+                    <div class="user-chip" id="user-chip" aria-label="Usuário logado">
+                        <div class="user-avatar" id="user-avatar" aria-hidden="true"></div>
+                        <span id="user-name">—</span>
+                        <span
+                            id="user-role-badge"
+                            class="pill-badge indigo ms-1"
+                            style="font-size: 0.65rem; padding: 2px 7px"
+                        ></span>
+                    </div>
+
+                    <!-- Admin: User Management button -->
+                    <button
+                        class="btn-ghost d-none"
+                        id="btn-usuarios"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal-usuarios"
+                        style="padding: 8px 14px; height: 36px"
+                        aria-label="Gerenciar usuários"
+                    >
+                        <i class="bi bi-people-fill"></i>
+                        <span class="d-none d-sm-inline ms-1">Usuários</span>
+                    </button>
+
+                    <!-- New Room -->
+                    <button
+                        class="btn-premium"
+                        id="btn-nova-sala"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvas-sala"
+                        style="padding: 8px 16px; height: 36px; font-size: 0.85rem"
+                        aria-label="Cadastrar nova sala"
+                    >
+                        <i class="bi bi-plus-lg"></i>
+                        <span class="d-none d-sm-inline">Nova Sala</span>
+                    </button>
+
+                    <!-- Logout -->
+                    <button
+                        class="btn-ghost"
+                        id="btn-logout"
+                        style="padding: 8px 12px; height: 36px"
+                        aria-label="Sair da plataforma"
+                    >
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ── Main Content ───────────────────────────────────────────────────── -->
+        <main class="page-wrapper" id="main-content">
+            <!-- Stats Row -->
+            <div class="stats-grid mb-4" role="region" aria-label="Indicadores rápidos de ocupação">
+                <div class="glass-card stat-card" id="stat-total">
+                    <div class="stat-icon" style="background: var(--color-indigo-soft)">
+                        <i class="bi bi-building" style="color: var(--color-indigo)"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Total de Salas</div>
+                        <div class="stat-value" id="val-total" aria-live="polite">—</div>
+                    </div>
+                </div>
+                <div class="glass-card stat-card" id="stat-livres">
+                    <div class="stat-icon" style="background: var(--color-sky-soft)">
+                        <i class="bi bi-door-open" style="color: var(--color-sky)"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Disponíveis Agora</div>
+                        <div class="stat-value" id="val-livres" aria-live="polite">—</div>
+                    </div>
+                </div>
+                <div class="glass-card stat-card" id="stat-ocupadas">
+                    <div class="stat-icon" style="background: var(--color-slate-soft)">
+                        <i class="bi bi-door-closed" style="color: var(--color-slate)"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Ocupadas Agora</div>
+                        <div class="stat-value" id="val-ocupadas" aria-live="polite">—</div>
+                    </div>
+                </div>
+                <div class="glass-card stat-card" id="stat-manutencao">
+                    <div class="stat-icon" style="background: var(--color-amber-soft)">
+                        <i class="bi bi-tools" style="color: var(--color-amber)"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Em Manutenção</div>
+                        <div class="stat-value" id="val-manutencao" aria-live="polite">—</div>
+                    </div>
+                </div>
+                <div class="glass-card stat-card" id="stat-reservas">
+                    <div class="stat-icon" style="background: var(--color-emerald-soft)">
+                        <i class="bi bi-calendar-check" style="color: var(--color-emerald)"></i>
+                    </div>
+                    <div>
+                        <div class="stat-label">Reservas Ativas</div>
+                        <div class="stat-value" id="val-reservas" aria-live="polite">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section header + Filters -->
+            <div
+                class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-4"
+            >
+                <div>
+                    <h1 class="section-heading">Espaços de Coworking</h1>
+                    <p class="section-subtext">Clique em uma sala para ver a agenda completa</p>
+                </div>
+                <div class="filter-group" role="group" aria-label="Filtrar salas por tipo">
+                    <button class="btn-filter active" data-filter="todos" id="filter-todos">Todos</button>
+                    <button class="btn-filter" data-filter="reuniao" id="filter-reuniao">Reunião</button>
+                    <button class="btn-filter" data-filter="privativa" id="filter-privativa">Privativa</button>
+                    <button class="btn-filter" data-filter="desk" id="filter-desk">Hot Desk</button>
+                    <button class="btn-filter" data-filter="manutencao" id="filter-manutencao">Manutenção</button>
+                </div>
+            </div>
+
+            <!-- Room Cards Grid -->
+            <div class="rooms-grid" id="rooms-container" role="list" aria-label="Lista de salas de coworking">
+                <!-- Skeleton Loading -->
+                <div class="glass-card" style="height: 300px; animation: badgePulse 2s infinite"></div>
+                <div
+                    class="glass-card"
+                    style="height: 300px; animation: badgePulse 2s infinite; animation-delay: 0.15s"
+                ></div>
+                <div
+                    class="glass-card"
+                    style="height: 300px; animation: badgePulse 2s infinite; animation-delay: 0.3s"
+                ></div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="text-center py-5 d-none" aria-live="polite">
+                <div style="font-size: 3rem; color: var(--text-muted); margin-bottom: 12px">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 1rem">Nenhuma sala encontrada para este filtro.</p>
+            </div>
+        </main>
+
+        <!-- ═════════════════════════════════════════════════════════════════════════
+     OFFCANVAS — Cadastrar / Editar Sala
+     ═════════════════════════════════════════════════════════════════════════ -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-sala" aria-labelledby="offcanvas-sala-title">
+            <div class="offcanvas-header">
+                <h2 class="fs-5 fw-bold" id="offcanvas-sala-title">Cadastrar Nova Sala</h2>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Fechar"
+                ></button>
+            </div>
+            <div class="offcanvas-body">
+                <form id="form-sala" novalidate>
+                    <input type="hidden" id="sala-id-edit" />
+                    <div class="mb-3">
+                        <label for="sala-nome" class="form-label">Nome da Sala *</label>
+                        <input
+                            type="text"
+                            class="form-control input-premium"
+                            id="sala-nome"
+                            placeholder="Ex: Sala de Reunião Alpha"
+                            autocomplete="off"
+                            required
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="sala-tipo" class="form-label">Tipo *</label>
+                        <select class="form-select input-premium" id="sala-tipo" required>
+                            <option value="" disabled selected>Selecione...</option>
+                            <option value="reuniao">Sala de Reunião</option>
+                            <option value="privativa">Sala Privativa</option>
+                            <option value="desk">Hot Desk</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label for="sala-capacidade" class="form-label">Capacidade *</label>
+                            <input
+                                type="number"
+                                class="form-control input-premium"
+                                id="sala-capacidade"
+                                placeholder="Pessoas"
+                                min="1"
+                                required
+                            />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="sala-preco" class="form-label">Preço/hora (R$) *</label>
+                            <input
+                                type="number"
+                                class="form-control input-premium"
+                                id="sala-preco"
+                                placeholder="0.00"
+                                min="0"
+                                step="0.01"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sala-status" class="form-label">Status</label>
+                        <select class="form-select input-premium" id="sala-status">
+                            <option value="disponivel">Disponível</option>
+                        </select>
+                        <small class="text-muted" style="font-size: 0.78rem">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Para agendar períodos de manutenção, acesse a <strong>Agenda</strong> da sala.
+                        </small>
+                    </div>
+                    <button
+                        type="submit"
+                        class="btn-premium w-100 mt-2"
+                        id="btn-submit-sala"
+                        style="justify-content: center"
+                    >
+                        <i class="bi bi-plus-circle me-2"></i> <span id="btn-sala-text">Cadastrar Sala</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═════════════════════════════════════════════════════════════════════════
+     MODAL — Gerenciar Usuários (Admin only)
+     ═════════════════════════════════════════════════════════════════════════ -->
+        <div
+            class="modal fade"
+            id="modal-usuarios"
+            tabindex="-1"
+            aria-labelledby="modal-usuarios-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-usuarios-title">
+                            <i class="bi bi-people-fill me-2" style="color: var(--color-indigo)"></i>
+                            Gerenciar Usuários
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"
+                        ></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                        <!-- Add User Form -->
+                        <div class="glass-card p-3 mb-4">
+                            <h6 class="fw-semibold mb-3" style="color: var(--text-primary)">
+                                <i class="bi bi-person-plus me-1" style="color: var(--color-indigo)"></i>
+                                Adicionar Usuário
+                            </h6>
+                            <form id="form-novo-usuario" novalidate>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <input
+                                            type="text"
+                                            class="form-control input-premium"
+                                            id="new-user-nome"
+                                            placeholder="Nome completo"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input
+                                            type="email"
+                                            class="form-control input-premium"
+                                            id="new-user-email"
+                                            placeholder="E-mail"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input
+                                            type="password"
+                                            class="form-control input-premium"
+                                            id="new-user-senha"
+                                            placeholder="Senha (mín. 6 caracteres)"
+                                            required
+                                            minlength="6"
+                                        />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-select input-premium" id="new-user-role">
+                                            <option value="user">Usuário</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button
+                                            type="submit"
+                                            class="btn-premium w-100"
+                                            style="height: 48px; font-size: 0.85rem; justify-content: center"
+                                            id="btn-add-user"
+                                        >
+                                            <i class="bi bi-plus"></i> Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Users Table -->
+                        <div class="table-responsive">
+                            <table class="table-dark-custom w-100" id="tabela-usuarios" aria-label="Lista de usuários">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nome</th>
+                                        <th scope="col">E-mail</th>
+                                        <th scope="col">Perfil</th>
+                                        <th scope="col">Desde</th>
+                                        <th scope="col">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios-tbody">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-3" style="color: var(--text-secondary)">
+                                            Carregando...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═════════════════════════════════════════════════════════════════════════
+     MODAL — Editar Usuário
+     ═════════════════════════════════════════════════════════════════════════ -->
+        <div
+            class="modal fade"
+            id="modal-edit-usuario"
+            tabindex="-1"
+            aria-labelledby="modal-edit-usuario-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-edit-usuario-title">
+                            <i class="bi bi-person-gear me-2" style="color: var(--color-indigo)"></i>
+                            Editar Usuário
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- User info chip -->
+                        <div
+                            id="edit-user-chip"
+                            class="d-flex align-items-center gap-3 mb-4 p-3"
+                            style="
+                                background: var(--bg-dark-soft);
+                                border-radius: 12px;
+                                border: 1px solid var(--border-color);
+                            "
+                        >
+                            <div
+                                class="user-avatar"
+                                id="edit-user-avatar-preview"
+                                style="width: 46px; height: 46px; font-size: 1rem; flex-shrink: 0"
+                            ></div>
+                            <div>
+                                <div
+                                    id="edit-user-nome-preview"
+                                    class="fw-semibold"
+                                    style="color: var(--text-primary)"
+                                ></div>
+                                <div
+                                    id="edit-user-email-preview"
+                                    style="font-size: 0.82rem; color: var(--text-secondary)"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <form id="form-edit-usuario" novalidate>
+                            <input type="hidden" id="edit-user-id" />
+
+                            <div class="mb-3">
+                                <label for="edit-user-nome" class="form-label">Nome</label>
+                                <input
+                                    type="text"
+                                    class="form-control input-premium"
+                                    id="edit-user-nome"
+                                    placeholder="Nome completo"
+                                    autocomplete="off"
+                                />
+                                <small class="text-muted">Deixe em branco para não alterar.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit-user-email" class="form-label">E-mail</label>
+                                <input
+                                    type="email"
+                                    class="form-control input-premium"
+                                    id="edit-user-email"
+                                    placeholder="novo@email.com"
+                                    autocomplete="off"
+                                />
+                                <small class="text-muted">Deixe em branco para não alterar.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit-user-senha" class="form-label">Nova Senha</label>
+                                <div style="position: relative">
+                                    <input
+                                        type="password"
+                                        class="form-control input-premium"
+                                        id="edit-user-senha"
+                                        placeholder="Mínimo 6 caracteres"
+                                        autocomplete="new-password"
+                                        style="padding-right: 46px"
+                                        minlength="6"
+                                    />
+                                    <button
+                                        type="button"
+                                        id="toggle-edit-senha"
+                                        class="btn-icon"
+                                        aria-label="Mostrar ou esconder nova senha"
+                                        style="
+                                            position: absolute;
+                                            right: 10px;
+                                            top: 50%;
+                                            transform: translateY(-50%);
+                                            padding: 4px 8px;
+                                            border: none;
+                                        "
+                                    >
+                                        <i class="bi bi-eye" id="edit-eye-icon"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Deixe em branco para não alterar.</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="edit-user-role" class="form-label">Perfil de Acesso</label>
+                                <select class="form-select input-premium" id="edit-user-role">
+                                    <option value="user">Usuário</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="btn-premium w-100"
+                                id="btn-submit-edit-user"
+                                style="justify-content: center"
+                            >
+                                <i class="bi bi-check-circle me-2"></i> Salvar Alterações
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Templates -->
+        <template id="tpl-room-card">
+            <article class="glass-card room-card animate-in" role="listitem" tabindex="0">
+                <div class="room-img-wrap">
+                    <img class="room-img" loading="lazy" alt="" />
+                    <div class="room-img-overlay" aria-hidden="true"></div>
+                    <span class="room-badge" data-bind="badge"></span>
+                    <span class="room-type-pill text-white" data-bind="tipo"></span>
+                </div>
+                <div class="room-body">
+                    <h2 class="room-name" data-bind="nome"></h2>
+                    <div class="room-meta">
+                        <span data-bind="capacidade"></span>
+                        <span data-bind="reservas-count"></span>
+                    </div>
+                    <div
+                        class="room-info-manutencao d-none"
+                        style="
+                            font-size: 0.78rem;
+                            color: var(--color-amber);
+                            background: rgba(245, 158, 11, 0.08);
+                            border-radius: 8px;
+                            padding: 7px 10px;
+                            margin-bottom: 6px;
+                            border-left: 3px solid var(--color-amber);
+                        "
+                    >
+                        <i class="bi bi-tools me-1" aria-hidden="true"></i>
+                        <strong>Manutenção:</strong> <span data-bind="manutencao-info"></span>
+                    </div>
+                    <div
+                        class="room-info-reserva d-none"
+                        style="
+                            font-size: 0.78rem;
+                            color: var(--text-secondary);
+                            background: rgba(255, 255, 255, 0.04);
+                            border-radius: 8px;
+                            padding: 7px 10px;
+                            margin-bottom: 10px;
+                        "
+                    >
+                        <i class="bi bi-clock me-1" aria-hidden="true"></i>
+                        <strong>Próxima:</strong> <span data-bind="reserva-info"></span>
+                    </div>
+                    <div class="room-price-row">
+                        <div>
+                            <span class="room-price-val" data-bind="preco"></span>
+                            <span class="room-price-unit">/hora</span>
+                        </div>
+                        <div class="room-cta" aria-hidden="true">Ver agenda <i class="bi bi-arrow-right ms-1"></i></div>
+                    </div>
+                    <div class="room-actions" onclick="event.stopPropagation()">
+                        <button class="btn-icon primary btn-agenda" type="button">
+                            <i class="bi" aria-hidden="true"></i> <span data-bind="btn-agenda-label"></span>
+                        </button>
+                        <button class="btn-icon btn-edit" type="button">
+                            <i class="bi bi-pencil" aria-hidden="true"></i> Editar
+                        </button>
+                        <button class="btn-icon danger btn-delete" type="button">
+                            <i class="bi bi-trash" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </template>
+
+        <template id="tpl-usuario-row">
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px">
+                        <div
+                            class="user-avatar"
+                            style="width: 30px; height: 30px; font-size: 0.7rem"
+                            data-bind="avatar"
+                        ></div>
+                        <span data-bind="nome"></span>
+                    </div>
+                </td>
+                <td style="color: var(--text-secondary-light)" data-bind="email"></td>
+                <td><span class="pill-badge" data-bind="role-badge"></span></td>
+                <td style="color: var(--text-secondary); font-size: 0.85rem" data-bind="criado-em"></td>
+                <td>
+                    <div style="display: flex; gap: 6px">
+                        <button class="btn-icon primary btn-edit-user" type="button">
+                            <i class="bi bi-pencil" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn-icon danger btn-delete-user" type="button">
+                            <i class="bi bi-trash" aria-hidden="true"></i>
+                        </button>
+                        <span class="label-voce d-none" style="color: var(--text-muted); font-size: 0.78rem">Você</span>
+                    </div>
+                </td>
+            </tr>
+        </template>
+
+        <!-- ── Bootstrap JS ─────────────────────────────────────────────────────── -->
+        <script src="../assets/js/bootstrap.bundle.min.js"></script>
+        <!-- Auth Helpers -->
+        <script src="../js/auth.js"></script>
+        <!-- Dashboard Logic -->
+        <script src="dashboard.js"></script>
+    </body>
+</html>
