@@ -399,9 +399,17 @@ async function addUser(e) {
     };
 
     try {
+        const headers = { "Content-Type": "application/json" };
+        if (payload.role === "admin") {
+            const currentUser = getCurrentUser();
+            if (currentUser?.token) {
+                headers["Authorization"] = `Bearer ${currentUser.token}`;
+            }
+        }
+
         const res = await fetch(`${API_BASE}/usuarios/registrar`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify(payload),
         });
         const data = await res.json();
@@ -467,9 +475,9 @@ async function submitEditUser(e) {
         }
         payload.senha = senha;
     }
-    payload.role = role;
+    if (role) payload.role = role;
 
-    if (!payload.nome && !payload.email && !payload.senha) {
+    if (!payload.nome && !payload.email && !payload.senha && !payload.role) {
         showAlert("Preencha ao menos um campo para atualizar.", "warning");
         btn.disabled = false;
         btn.innerHTML = orig;

@@ -675,9 +675,11 @@ async function submitReservation(e) {
     const user = getCurrentUser();
 
     try {
-        const endpoint = isMaint ? `${API_BASE}/salas/${SALA_ID}/manutencoes` : `${API_BASE}/salas/${SALA_ID}/reservar`;
+        const endpoint = isMaint ? `${API_BASE}/salas/${SALA_ID}/manutencoes` : `${API_BASE}/reservas`;
 
-        const bodyObj = isMaint ? { inicio, fim } : { inicio, fim, usuario_id: user?.id || null };
+        const bodyObj = isMaint
+            ? { inicio, fim }
+            : { sala_id: parseInt(SALA_ID, 10), inicio, fim, usuario_id: user?.id || null };
 
         const res = await fetch(endpoint, {
             method: "POST",
@@ -764,7 +766,15 @@ if (typeof applyFontScale === "function") {
 
 function getReservasForDay(date) {
     if (!salaData?.reservas) return [];
-    return salaData.reservas.filter((r) => isSameDay(parseDate(r.inicio), date));
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+    return salaData.reservas.filter((r) => {
+        const ri = parseDate(r.inicio);
+        const rf = parseDate(r.fim);
+        return ri < dayEnd && rf > dayStart;
+    });
 }
 
 function getManutencoesForDay(date) {
