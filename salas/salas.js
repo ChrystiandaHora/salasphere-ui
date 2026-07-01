@@ -681,9 +681,14 @@ async function submitReservation(e) {
             ? { inicio, fim }
             : { sala_id: parseInt(SALA_ID, 10), inicio, fim, usuario_id: user?.id || null };
 
+        const headers = { "Content-Type": "application/json" };
+        if (isMaint && user?.token) {
+            headers["Authorization"] = `Bearer ${user.token}`;
+        }
+
         const res = await fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify(bodyObj),
         });
         const data = await res.json();

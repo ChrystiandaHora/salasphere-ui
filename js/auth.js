@@ -123,28 +123,3 @@ function showAlert(message, type = "success", duration = 4000) {
     }, duration);
 }
 
-// ─── Fetch Timezone Interceptor ───────────────────────────────────────────────
-(function () {
-    const originalFetch = window.fetch;
-    window.fetch = async function (resource, options = {}) {
-        options.headers = options.headers || {};
-        const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
-
-        if (options.headers instanceof Headers) {
-            if (!options.headers.has("X-Timezone")) {
-                options.headers.append("X-Timezone", userTz);
-            }
-        } else if (Array.isArray(options.headers)) {
-            const hasTz = options.headers.some(([key]) => key.toLowerCase() === "x-timezone");
-            if (!hasTz) {
-                options.headers.push(["X-Timezone", userTz]);
-            }
-        } else {
-            const hasTz = Object.keys(options.headers).some((key) => key.toLowerCase() === "x-timezone");
-            if (!hasTz) {
-                options.headers["X-Timezone"] = userTz;
-            }
-        }
-        return originalFetch(resource, options);
-    };
-})();

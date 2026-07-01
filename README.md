@@ -1,4 +1,4 @@
-# 🎨 SalaSphere Front-end — SPA Reativa Premium (Front-end)
+# SalaSphere Front-end — SPA Reativa Premium (Front-end)
 
 Este é o front-end do **SalaSphere**, uma aplicação web elegante e reativa no modelo **Single Page Application (SPA)**, projetada com HTML, CSS e JavaScript puro (Vanilla JS) para a gestão completa de coworkings, salas e agendamentos.
 
@@ -7,7 +7,7 @@ Este é o front-end do **SalaSphere**, uma aplicação web elegante e reativa no
 - **Tema Glassmorphism Escuro**: Design futurista com backdrop-filters semi-transparentes de desfoque.
 - **Micro-animações Ricas**: Hover com efeito *glow* em cards de salas, toasts deslizantes e shakes de erros físicos.
 - **Timeline de 24 Horas**: Visualizações diária e semanal expandidas para cobrir todas as 24h do dia.
-- **Sincronização Automática de Fuso**: Interceptador nativo do `fetch` que envia o fuso horário geográfico do cliente no header `X-Timezone`.
+- **Fuso Horário Simplificado**: Operação integrada com o fuso horário padrão do servidor (`America/Sao_Paulo`).
 - **Ajuste Dinâmico no Mês (Hoje)**: Correção automática de slot no calendário mensal caso o horário comercial padrão já tenha passado no dia atual.
 - **Visualização de Janelas de Manutenção**: Bloques visuais de manutenção (laranja/âmbar) integrados com a timeline e calculados em tempo real.
 - **Templates Nativos HTML**: Utilização de tags `<template>` para renderização de cards e tabelas no lugar de strings de concatenação pesadas no JS.
@@ -31,18 +31,17 @@ Para rodar a aplicação, é necessário apenas ter o back-end da API rodando lo
 
 ## Módulos e Funcionalidades
 
-### 1. 🔐 Autenticação e Guarda de Rotas (`index.html`)
+### 1. Autenticação e Guarda de Rotas (`index.html`)
 * Formulário deslizante unificando Login e Cadastro.
 * Scripts de segurança (`auth.js`) contendo guards que barram o acesso direto a páginas internas caso não haja sessão ativa gravada em `localStorage`.
-* **Interceptador Fetch**: Injeta de forma global o header `X-Timezone` (detectando o fuso pelo navegador do cliente via `Intl.DateTimeFormat().resolvedOptions().timeZone`) em qualquer requisição disparada à API.
 
-### 2. 📊 Dashboard Administrativo (`dashboard/`)
+### 2. Dashboard Administrativo (`dashboard/`)
 * **Estatísticas Rápidas**: Contadores reativos de salas (totais, livres, em manutenção) e reservas.
 * **Templates Reutilizáveis**: Renderização de usuários e salas por meio de `<template>` clonados do HTML, garantindo performance e legibilidade de código.
 * **Filtros Dinâmicos**: Exibição e ordenação de salas por status, incluindo salas "Em Manutenção" com cálculo de status em tempo real.
 * **Painel Offcanvas**: Formulários deslizantes para cadastro, edições e remoções de salas e gerenciamento completo de credenciais e permissões de usuários.
 
-### 3. 📅 Timeline e Agenda Reativa (`salas/`)
+### 3. Timeline e Agenda Reativa (`salas/`)
 Acesso profundo às agendas de reservas e manutenções de cada sala, operado a partir de três modos de visualização:
 * **Aba Dia**: Linha do tempo vertical cobrindo as **24 horas do dia** (de `00:00` a `23:00`), com rolagem automática para focar na hora corrente. Slots do passado ficam inativos de forma inteligente.
 * **Aba Semana**: Grade contendo os 7 dias da semana das `00:00` às `23:00` para planejamento ágil de médio prazo.

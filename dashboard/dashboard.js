@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (user.role === "admin") {
             document.getElementById("btn-usuarios").classList.remove("d-none");
+            document.getElementById("btn-nova-sala").classList.remove("d-none");
         }
     }
 
@@ -224,17 +225,22 @@ function renderRooms() {
             openAgenda(sala.id);
         });
 
-        card.querySelector(".btn-edit").setAttribute("aria-label", `Editar sala ${sala.nome}`);
-        card.querySelector(".btn-edit").addEventListener("click", (e) => {
-            e.stopPropagation();
-            openEditRoom(sala.id);
-        });
+        if (!isAdmin()) {
+            card.querySelector(".btn-edit").remove();
+            card.querySelector(".btn-delete").remove();
+        } else {
+            card.querySelector(".btn-edit").setAttribute("aria-label", `Editar sala ${sala.nome}`);
+            card.querySelector(".btn-edit").addEventListener("click", (e) => {
+                e.stopPropagation();
+                openEditRoom(sala.id);
+            });
 
-        card.querySelector(".btn-delete").setAttribute("aria-label", `Excluir sala ${sala.nome}`);
-        card.querySelector(".btn-delete").addEventListener("click", (e) => {
-            e.stopPropagation();
-            confirmDeleteRoom(sala.id, sala.nome);
-        });
+            card.querySelector(".btn-delete").setAttribute("aria-label", `Excluir sala ${sala.nome}`);
+            card.querySelector(".btn-delete").addEventListener("click", (e) => {
+                e.stopPropagation();
+                confirmDeleteRoom(sala.id, sala.nome);
+            });
+        }
 
         container.appendChild(card);
     });
@@ -290,18 +296,24 @@ async function submitRoomForm(e) {
         status: "disponivel",
     };
 
+    const user = getCurrentUser();
+    const headers = { "Content-Type": "application/json" };
+    if (user?.token) {
+        headers["Authorization"] = `Bearer ${user.token}`;
+    }
+
     try {
         let res, data;
         if (editingRoomId) {
             res = await fetch(`${API_BASE}/salas/${editingRoomId}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers,
                 body: JSON.stringify(payload),
             });
         } else {
             res = await fetch(`${API_BASE}/salas`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers,
                 body: JSON.stringify(payload),
             });
         }
@@ -329,8 +341,18 @@ async function confirmDeleteRoom(salaId, salaNome) {
         )
     )
         return;
+
+    const user = getCurrentUser();
+    const headers = {};
+    if (user?.token) {
+        headers["Authorization"] = `Bearer ${user.token}`;
+    }
+
     try {
-        const res = await fetch(`${API_BASE}/salas/${salaId}`, { method: "DELETE" });
+        const res = await fetch(`${API_BASE}/salas/${salaId}`, {
+            method: "DELETE",
+            headers,
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Erro ao excluir.");
         showAlert(`Sala "${salaNome}" removida com sucesso.`, "success");
