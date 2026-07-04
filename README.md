@@ -5,12 +5,11 @@ Este é o front-end do **SalaSphere**, uma aplicação web elegante e reativa no
 ## Key Features
 
 - **Tema Glassmorphism Escuro**: Design futurista com backdrop-filters semi-transparentes de desfoque.
-- **Micro-animações Ricas**: Hover com efeito *glow* em cards de salas, toasts deslizantes e shakes de erros físicos.
+- **Micro-animações**: Hover com efeito *glow* em cards de salas e toasts deslizantes.
 - **Timeline de 24 Horas**: Visualizações diária e semanal expandidas para cobrir todas as 24h do dia.
-- **Fuso Horário Simplificado**: Operação integrada com o fuso horário padrão do servidor (`America/Sao_Paulo`).
-- **Ajuste Dinâmico no Mês (Hoje)**: Correção automática de slot no calendário mensal caso o horário comercial padrão já tenha passado no dia atual.
-- **Visualização de Janelas de Manutenção**: Bloques visuais de manutenção (laranja/âmbar) integrados com a timeline e calculados em tempo real.
-- **Templates Nativos HTML**: Utilização de tags `<template>` para renderização de cards e tabelas no lugar de strings de concatenação pesadas no JS.
+- **Ajuste Dinâmico de Horário**: Ao abrir uma nova reserva para o dia atual em um horário que já passou, o início é corrigido automaticamente para a próxima hora cheia futura.
+- **Visualização de Janelas de Manutenção**: Blocos visuais de manutenção (laranja/âmbar) integrados com a timeline e calculados em tempo real.
+- **Templates Nativos HTML**: Uso de tags `<template>` para renderização dos cards de sala e da tabela de usuários no dashboard.
 
 ---
 
@@ -31,13 +30,14 @@ Para rodar a aplicação, é necessário apenas ter o back-end da API rodando lo
 
 ## Módulos e Funcionalidades
 
-### 1. Autenticação e Guarda de Rotas (`index.html`)
-* Formulário deslizante unificando Login e Cadastro.
-* Scripts de segurança (`auth.js`) contendo guards que barram o acesso direto a páginas internas caso não haja sessão ativa gravada em `localStorage`.
+### 1. Roteamento e Autenticação
+* `index.html` (raiz): redirecionador que verifica a sessão em `localStorage` e encaminha para `home/` ou `dashboard/`.
+* `home/index.html`: formulário deslizante unificando Login e Cadastro.
+* `js/auth.js`: guards que barram o acesso direto às páginas internas caso não haja sessão ativa.
 
 ### 2. Dashboard Administrativo (`dashboard/`)
 * **Estatísticas Rápidas**: Contadores reativos de salas (totais, livres, em manutenção) e reservas.
-* **Templates Reutilizáveis**: Renderização de usuários e salas por meio de `<template>` clonados do HTML, garantindo performance e legibilidade de código.
+* **Templates Reutilizáveis**: Cards de sala e linhas de usuário renderizados a partir de `<template>` clonados do HTML.
 * **Filtros Dinâmicos**: Exibição e ordenação de salas por status, incluindo salas "Em Manutenção" com cálculo de status em tempo real.
 * **Painel Offcanvas**: Formulários deslizantes para cadastro, edições e remoções de salas e gerenciamento completo de credenciais e permissões de usuários.
 
@@ -46,7 +46,6 @@ Acesso profundo às agendas de reservas e manutenções de cada sala, operado a 
 * **Aba Dia**: Linha do tempo vertical cobrindo as **24 horas do dia** (de `00:00` a `23:00`), com rolagem automática para focar na hora corrente. Slots do passado ficam inativos de forma inteligente.
 * **Aba Semana**: Grade contendo os 7 dias da semana das `00:00` às `23:00` para planejamento ágil de médio prazo.
 * **Aba Mês**: Calendário clássico mensal com sinalizações dinâmicas.
-  * **Correção Dinâmica**: Clicar na célula do dia de "Hoje" após o horário comercial padrão ajusta automaticamente o início do agendamento para a **próxima hora cheia futura** (evitando o travamento por data retroativa e simplificando o fluxo).
 * **Delegação de Eventos**: Cliques e navegação gerenciados por meio de escutas centrais utilizando atributos declarativos `data-action`, evitando injeções de inline onclick complexas no JavaScript.
 
 ---
