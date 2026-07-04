@@ -86,7 +86,7 @@ async function fetchRooms() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Erro ao carregar salas.");
         rooms = data;
-        updateStats();
+        await updateStats();
         renderRooms();
     } catch (err) {
         showAlert(`Erro ao carregar salas: ${err.message}`, "danger");
@@ -98,12 +98,11 @@ async function fetchRooms() {
     }
 }
 
-function updateStats() {
+async function updateStats() {
     const now = new Date();
     let livres = 0,
         ocupadas = 0,
-        manutencao = 0,
-        reservasAtivas = 0;
+        manutencao = 0;
 
     rooms.forEach((sala) => {
         if (sala.status === "manutencao") {
@@ -117,14 +116,22 @@ function updateStats() {
             if (ocupadaAgora) ocupadas++;
             else livres++;
         }
-        reservasAtivas += sala.reservas?.filter((r) => new Date(r.fim) >= now).length || 0;
     });
 
     document.getElementById("val-total").textContent = rooms.length;
     document.getElementById("val-livres").textContent = livres;
     document.getElementById("val-ocupadas").textContent = ocupadas;
     document.getElementById("val-manutencao").textContent = manutencao;
-    document.getElementById("val-reservas").textContent = reservasAtivas;
+
+    try {
+        const res = await fetch(`${API_BASE}/reservas`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erro ao carregar reservas.");
+        const reservasAtivas = data.filter((r) => new Date(r.fim) >= now).length;
+        document.getElementById("val-reservas").textContent = reservasAtivas;
+    } catch {
+        document.getElementById("val-reservas").textContent = "—";
+    }
 }
 
 function renderRooms() {
@@ -387,9 +394,7 @@ async function loadUsers() {
 
             const isMe = u.id === currentUser?.id;
             row.querySelector(".btn-edit-user").setAttribute("aria-label", `Editar usuário ${u.nome}`);
-            row.querySelector(".btn-edit-user").addEventListener("click", () =>
-                openEditUser(u.id, u.nome, u.email, u.role)
-            );
+            row.querySelector(".btn-edit-user").addEventListener("click", () => openEditUser(u.id));
 
             if (isMe) {
                 row.querySelector(".btn-delete-user").classList.add("d-none");
@@ -447,18 +452,29 @@ async function addUser(e) {
     }
 }
 
-function openEditUser(userId, nome, email, role) {
+async function openEditUser(userId) {
+    let user;
+    try {
+        const res = await fetch(`${API_BASE}/usuarios/${userId}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erro ao carregar usuário.");
+        user = data;
+    } catch (err) {
+        showAlert(err.message, "danger");
+        return;
+    }
+
     // Populate preview chip
-    document.getElementById("edit-user-avatar-preview").textContent = userInitials(nome);
-    document.getElementById("edit-user-nome-preview").textContent = nome;
-    document.getElementById("edit-user-email-preview").textContent = email;
+    document.getElementById("edit-user-avatar-preview").textContent = userInitials(user.nome);
+    document.getElementById("edit-user-nome-preview").textContent = user.nome;
+    document.getElementById("edit-user-email-preview").textContent = user.email;
 
     // Pre-fill form with current values (user can selectively change)
-    document.getElementById("edit-user-id").value = userId;
-    document.getElementById("edit-user-nome").value = nome;
-    document.getElementById("edit-user-email").value = email;
+    document.getElementById("edit-user-id").value = user.id;
+    document.getElementById("edit-user-nome").value = user.nome;
+    document.getElementById("edit-user-email").value = user.email;
     document.getElementById("edit-user-senha").value = "";
-    document.getElementById("edit-user-role").value = role;
+    document.getElementById("edit-user-role").value = user.role;
 
     // Close the users list modal and open the edit modal
     const usersModal = bootstrap.Modal.getInstance(document.getElementById("modal-usuarios"));
